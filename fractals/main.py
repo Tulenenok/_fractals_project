@@ -2,6 +2,7 @@ from view.RootWithVersions import *
 from view.CanvasField import *
 from view.keyInput import *
 from view.menu import *
+from controll.filesWork import *
 
 
 def _from_rgb(rgb):
@@ -23,18 +24,22 @@ def changeRule(rule, aksiom):
     return ''.join(newRule)
 
 
-def interpret(field, x=0, y=0, alpha = 90, delta = 22.5, d = 2, axiom= 'F', rules={}, n=5, color='blue'):
+def interpret(field, startX=0, startY=0, startAlpha=90, delta=22.5, d=2, axiom='F',
+              rules={}, n=5, color='blue', width=2, needClean=True):
     rule = axiom
     stack = []
 
+    x, y, alpha = startX, startY, startAlpha
     for i in range(n):
-        field.canva.clear()
+        if needClean:
+            field.canva.clear()
+            x, y, alpha = startX, startY, startAlpha
         for r in rule:
-            if r in 'FfLlRr':
+            if r in 'FfLlRrXx':
                 newX = x + d * math.cos(math.radians(alpha))
                 newY = y + d * math.sin(math.radians(alpha))
-                if r in 'FLR':
-                    seg = CanvasSegment(CanvasPoint(x, y), CanvasPoint(newX, newY), color=color)
+                if r in 'FLRX':
+                    seg = CanvasSegment(CanvasPoint(x, y), CanvasPoint(newX, newY), color=color,width=width)
                     seg.show(field.canva)
                     field.canva.update()
                 x, y = newX, newY
@@ -50,6 +55,7 @@ def interpret(field, x=0, y=0, alpha = 90, delta = 22.5, d = 2, axiom= 'F', rule
         rule = changeRule(rule, rules)
         # time.sleep(1)
 
+
 def drawFractal(field, startParams, fractalParams, colorsParams):
     x, y, alpha = map(int, startParams.getXY())
     Axiom, Rule, Step, Delta, N = fractalParams.getXY()
@@ -57,8 +63,12 @@ def drawFractal(field, startParams, fractalParams, colorsParams):
     rules = eval('{' + Rule + '}')
     N = int(N)
 
+    bg, line, width = colorsParams.getXY()
+
     field.canva.clear()
-    interpret(field, x, y, alpha, Delta, Step, Axiom, rules, N)
+    interpret(field, x, y, alpha, Delta, Step, Axiom, rules, N, color=line, width=width)
+
+
 
 
 
@@ -92,7 +102,7 @@ def main():
 
     fractalParams = Xs_Ys_Form(settings, Settings.COLOR_LOC_LINE, "Fractal parameters", Settings.WIDTH_INPUT - 2,
                              fields=['Axiom: ', 'Rule: ', 'Step: ', 'Delta: ', 'N: '], showButton=False)
-    fractalParams.insertXY(('F-F-F-F', '"F": "FF-F--F-F"', 5, 90, 4))
+    fractalParams.insertXY(('F-F-F-F', '"F": "FF-F-F-F-FF"', 2, 90, 4))
     fractalParams.show(Settings.COLOR_LOC_LINE, posx=10, posy=160)
 
     colorsParams = Xs_Ys_Form(settings, Settings.COLOR_LOC_LINE, "Appearance", Settings.WIDTH_INPUT - 2,
@@ -100,10 +110,10 @@ def main():
     colorsParams.insertXY(('white', 'blue', 2))
     colorsParams.show(Settings.COLOR_LOC_LINE, posx=10, posy=370)
 
-    loadButton = Button(settings, text="Load", padx=21, pady=7, bg="#d1d6e4")
+    loadButton = Button(settings, text="Load", padx=21, pady=7, bg="#d1d6e4", command=lambda : loadData(startParams, fractalParams, colorsParams))
     loadButton.place(x=10, y=520)
 
-    saveButton = Button(settings, text="Save", padx=21, pady=7, bg="#d1d6e4")
+    saveButton = Button(settings, text="Save", padx=21, pady=7, bg="#d1d6e4", command=lambda : saveData(startParams, fractalParams, colorsParams))
     saveButton.place(x=100, y=520)
 
     goButton = Button(settings, text="[ Draw fractal ]", padx=40, pady=15, bg=Settings.COLOR_LOC_BG, command=lambda : drawFractal(c, startParams, fractalParams, colorsParams))
