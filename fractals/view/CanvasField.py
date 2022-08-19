@@ -327,7 +327,7 @@ class PolygonField(CartesianField):
         self.rotatePoint = CanvasPoint(0, 0)
         self.colorNowPol = Settings.COLOR_LINE
 
-        self.polygons = [CanvasPolLine([], self.colorNowPol)]
+        self.polygons = []
         self.binds = []
 
     def click(self, event):
@@ -350,12 +350,24 @@ class PolygonField(CartesianField):
 
     def clear(self):
         self.delete('line')
+        self.polygons.clear()
 
     def clearResult(self):
         self.clear()
 
     def myUpdate(self):
         super(PolygonField, self).myUpdate()
+        for pol in self.polygons:
+            pol.reShow(self)
+
+    def addPol(self, pol):
+        self.polygons.append(pol)
+
+    def delPol(self, pol):
+        try:
+            self.polygons.remove(pol)
+        except:
+            print('Элемент для удаления не найден')
 
     def saveCanva(self, f):
         pickle.dump(self.polygons, f)
@@ -375,8 +387,6 @@ class PolygonField(CartesianField):
 
     def updateShowFlags(self):
         super(PolygonField, self).updateShowFlags()
-        for pol in self.polygons:
-            pol.updateShowFlag(self.ShowComments)
 
     def changeColor(self, XEvent, YEvent):
         color = askcolor()[1]

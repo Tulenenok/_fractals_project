@@ -3,57 +3,20 @@ from view.CanvasField import *
 from view.keyInput import *
 from view.menu import *
 from controll.filesWork import *
+from model.Fractal import *
 
-
-def _from_rgb(rgb):
-    return "#%02x%02x%02x" % rgb
-
-
-def newColor():
-    return _from_rgb((random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)))
-
-
-def changeRule(rule, aksiom):
-    newRule = []
-    for r in rule:
-        if r in aksiom:
-            newRule.append(aksiom[r])
-        else:
-            newRule.append(r)
-
-    return ''.join(newRule)
 
 
 def interpret(field, startX=0, startY=0, startAlpha=90, delta=22.5, d=2, axiom='F',
-              rules={}, n=5, color='blue', width=2, needClean=True):
-    rule = axiom
-    stack = []
+              rules={}, n=5, color='blue', width=2, needClean=True, needDelay=False):
 
-    x, y, alpha = startX, startY, startAlpha
-    for i in range(n):
-        if needClean:
-            field.canva.clear()
-            x, y, alpha = startX, startY, startAlpha
-        for r in rule:
-            if r in 'FfLlRrXx':
-                newX = x + d * math.cos(math.radians(alpha))
-                newY = y + d * math.sin(math.radians(alpha))
-                if r in 'FLRX':
-                    seg = CanvasSegment(CanvasPoint(x, y), CanvasPoint(newX, newY), color=color,width=width)
-                    seg.show(field.canva)
-                    field.canva.update()
-                x, y = newX, newY
-            if r == '+':
-                alpha += delta
-            if r == '-':
-                alpha -= delta
-            if r == '[':
-                stack.append((x, y, alpha))
-            if r == ']':
-                x, y, alpha = stack.pop()
+    newFractal = Fractal(startX, startY, startAlpha, delta, d, axiom, rules, n, color, width)
+    newFractal.show(field, needClean)
 
-        rule = changeRule(rule, rules)
-        # time.sleep(1)
+    field.canva.addPol(newFractal)
+
+    if needDelay:
+        time.sleep(1)
 
 
 def drawFractal(field, startParams, fractalParams, colorsParams):
@@ -64,13 +27,12 @@ def drawFractal(field, startParams, fractalParams, colorsParams):
     N = int(N)
 
     bg, line, width = colorsParams.getXY()
-
-    field.canva.clear()
-    interpret(field, x, y, alpha, Delta, Step, Axiom, rules, N, color=line, width=width)
-
-
-
-
+    try:
+        field.canva['bg'] = bg
+        field.canva.clear()
+        interpret(field, x, y, alpha, Delta, Step, Axiom, rules, N, color=line, width=width)
+    except:
+        showinfo('Error', 'Неверные параметры')
 
 def main():
     root = RootWithVersions()
