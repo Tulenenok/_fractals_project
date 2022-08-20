@@ -1,17 +1,29 @@
 import math, random
+
+from model.Tools import *
 from view.CanvasSegment import *
+
+class Params:
+    def __init__(self, startX, startY, startAlpha, delta, d, axiom, rules, n, color='blue', width=2):
+
+        self.x, self.y, self.alpha = map(int, (startX, startY, startAlpha))
+        self.step = float(d)
+        self.delta = float(delta) if Tools.isFloat(delta) else eval(delta)
+        self.axiom = axiom
+        self.rules = rules if type(rules) == dict else eval('{' + str(rules) + '}')
+        self.n = int(n)
+        self.color, self.width = color, int(width)
+
+    def getAll(self):
+        return self.x, self.y, self.alpha, self.delta, self.step, self.axiom, self.rules, self.n, self.color, self.width
+
+    def getCopy(self):
+        return Params(*self.getAll())
 
 
 class Fractal:
-    def __init__(self, startX=0, startY=0, startAlpha=90, delta=22.5, d=2, axiom='F',
-                       rules={}, n=5, color='blue', width=2):
-
-        self.x, self.y, self.alpha = startX, startY, startAlpha
-        self.delta, self.step = delta, d
-        self.axiom, self.rules = axiom, rules
-        self.n = n
-        self.color, self.width = color, width
-
+    def __init__(self, startX, startY, startAlpha, delta, d, axiom, rules, n, color='blue', width=2):
+        self.params = Params(startX, startY, startAlpha, delta, d, axiom, rules, n, color, width)
         self.segments = []
         self.updateShowFlag = False
 
@@ -22,42 +34,57 @@ class Fractal:
             for seg in self.segments:
                 seg.reShow(field)
 
-    def show(self, field, needClean=True):
-        rule = self.axiom
+    def show(self, field, needClean=False):
+        rule = self.params.axiom
         stack = []
 
-        x, y, alpha, d, delta = self.x, self.y, self.alpha, self.step, self.delta
-        for i in range(self.n):
+        tmpParams = self.params.getCopy()
+
+        self.segments.clear()
+        for i in range(self.params.n):
             if needClean:
                 field.canva.clear()
-                x, y, alpha = self.x, self.y, self.alpha
-                self.segments.clear()
+                tmpParams = self.params.getCopy()
             for r in rule:
-                if r in 'FfLlRrXx':
-                    newX = x + d * math.cos(math.radians(alpha))
-                    newY = y + d * math.sin(math.radians(alpha))
-                    if r in 'FLRX':
-                        seg = CanvasSegment(CanvasPoint(x, y), CanvasPoint(newX, newY), color=self.color, width=self.width)
+                if r.isalpha():
+                    newX = tmpParams.x + tmpParams.step * math.cos(math.radians(tmpParams.alpha))
+                    newY = tmpParams.y + tmpParams.step * math.sin(math.radians(tmpParams.alpha))
+                    if r.isupper():
+                        seg = CanvasSegment(Point_2d(tmpParams.x, tmpParams.y), Point_2d(newX, newY), color=tmpParams.color, width=tmpParams.width)
                         seg.show(field.canva)
-                        field.canva.update()
-                        self.segments.append(seg)
-                    x, y = newX, newY
+                        if self.params.n < 10:
+                            field.canva.update()
+                        if i == self.params.n - 1:
+                            self.segments.append(seg)
+                    tmpParams.x, tmpParams.y = newX, newY
                 if r == '+':
-                    alpha += delta
+                    tmpParams.alpha += tmpParams.delta
                 if r == '-':
-                    alpha -= delta
+                    tmpParams.alpha -= tmpParams.delta
                 if r == '[':
-                    stack.append((x, y, alpha))
+                    stack.append(tmpParams.getCopy())
                 if r == ']':
-                    x, y, alpha = stack.pop()
+                    tmpParams = stack.pop()
+                if r == '@':
+                    tmpParams.width = tmpParams.width * 0.8
+                    tmpParams.step = tmpParams.step * 0.8
 
-            rule = self._changeRule(rule, self.rules)
+            if self.params.n >= 10:
+                field.canva.update()
+
+            rule = self._changeRule(rule, tmpParams.rules)
 
     def _from_rgb(self, rgb):
         return "#%02x%02x%02x" % rgb
 
     def _newColor(self):
         return self._from_rgb((random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)))
+
+    def _newColor1(self, color):
+        color = color[1:]
+        rgb = list(int(color[i:i+2], 16) for i in (0, 2, 4))
+        r, g, b = map(lambda x: x + (256 - x) // 4, rgb)
+        return Tools.rgb_to_hex(r, g, b)
 
     def _changeRule(self, rule, aksiom):
         newRule = []

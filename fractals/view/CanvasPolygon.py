@@ -2,7 +2,7 @@ from model.Point import *
 from view.Settings import *
 from view.CanvasLine import *
 from view.CanvasSegment import *
-from view.CanvasPoint import *
+from view.Point_2d import *
 import time
 
 
@@ -134,7 +134,7 @@ class CanvasPolLine:
                 wasDel = True
 
         if len(self.points) > 1 and self.points[0] != self.points[-1]:
-            self.addPoint(field, CanvasPoint(self.points[0].x, self.points[0].y, self.points[0].color, showComments=self.points[0].showComments))
+            self.addPoint(field, Point_2d(self.points[0].x, self.points[0].y, self.points[0].color, showComments=self.points[0].showComments))
 
         self.reShow(field)
         return wasDel

@@ -1,5 +1,5 @@
 from model.Line import Line
-from view.CanvasPoint import CanvasPoint
+from view.Point_2d import Point_2d
 
 from tkinter import *
 
@@ -18,8 +18,8 @@ class CanvasLine(Line):
 
     def show(self, field):
         try:                                                    # Такого метода у канвы может не оказаться
-            xStart, yStart = field.coordinateShift(self.start)  # Точки перевели в понятие канвы
-            xEnd, yEnd = field.coordinateShift(self.end)
+            xStart, yStart = field.coordinateShift_2d(self.start)  # Точки перевели в понятие канвы
+            xEnd, yEnd = field.coordinateShift_2d(self.end)
         except:
             xStart, yStart = self.start.x, self.start.y
             xEnd, yEnd = self.end.x, self.end.y
@@ -40,7 +40,7 @@ class CanvasLine(Line):
 
         # Линия наклонная, надо посчитать для нее координаты от самого левого края, до самого правого
         else:
-            helpLine = Line(CanvasPoint(xStart, yStart), CanvasPoint(xEnd, yEnd))   # Прямая с коэффициентами канвы
+            helpLine = Line(Point_2d(xStart, yStart), Point_2d(xEnd, yEnd))   # Прямая с коэффициентами канвы
             xS, yS = 0, helpLine.findYByX(0)
             xE, yE = field.width, helpLine.findYByX(field.width)
 

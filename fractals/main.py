@@ -20,19 +20,20 @@ def interpret(field, startX=0, startY=0, startAlpha=90, delta=22.5, d=2, axiom='
 
 
 def drawFractal(field, startParams, fractalParams, colorsParams):
-    x, y, alpha = map(int, startParams.getXY())
+    x, y, alpha = startParams.getXY()
     Axiom, Rule, Step, Delta, N = fractalParams.getXY()
-    Step, Delta = map(float, (Step, Delta))
-    rules = eval('{' + Rule + '}')
-    N = int(N)
-
     bg, line, width = colorsParams.getXY()
-    try:
-        field.canva['bg'] = bg
-        field.canva.clear()
-        interpret(field, x, y, alpha, Delta, Step, Axiom, rules, N, color=line, width=width)
-    except:
-        showinfo('Error', 'Неверные параметры')
+
+    field.canva['bg'] = bg
+    field.canva.clear()
+    interpret(field, x, y, alpha, Delta, Step, Axiom, Rule, N, color=line, width=width)
+
+    # try:
+    #     field.canva['bg'] = bg
+    #     field.canva.clear()
+    #     interpret(field, x, y, alpha, Delta, Step, Axiom, Rule, N, color=line, width=width)
+    # except:
+    #     showinfo('Error', 'Неверные параметры')
 
 def main():
     root = RootWithVersions()

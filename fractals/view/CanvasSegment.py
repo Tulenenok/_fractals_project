@@ -1,5 +1,5 @@
 from model.Line import Line
-from view.CanvasPoint import *
+from view.Point_2d import *
 import math
 
 
@@ -59,8 +59,8 @@ class CanvasSegment(Line):
         self.xEnd, self.yEnd = None, None
 
     def coordShift(self, field):
-        self.xStart, self.yStart = field.coordinateShift(self.start)
-        self.xEnd, self.yEnd = field.coordinateShift(self.end)
+        self.xStart, self.yStart = field.coordinateShift_2d(self.start)
+        self.xEnd, self.yEnd = field.coordinateShift_2d(self.end)
 
     def show(self, field):
         self.coordShift(field)
@@ -74,7 +74,7 @@ class CanvasSegment(Line):
 
     def findFieldLine(self, field):
         self.coordShift(field)
-        self.fieldLine = Line(CanvasPoint(self.xStart, self.yStart), CanvasPoint(self.xEnd, self.yEnd))
+        self.fieldLine = Line(Point_2d(self.xStart, self.yStart), Point_2d(self.xEnd, self.yEnd))
 
     def showLikeClipper(self, field):
         self.coordShift(field)

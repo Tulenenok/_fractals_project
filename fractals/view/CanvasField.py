@@ -6,7 +6,7 @@ import tkinter as tk
 
 from PIL import ImageTk, Image
 
-from view.CanvasPoint import CanvasPoint
+from view.Point_2d import Point_2d
 from view.CanvasLine import CanvasLine
 from view.Settings import Settings
 from view.CanvasPolygon import *
@@ -104,7 +104,11 @@ class CoordGrid(ResizingCanvas):
         self.XStart, self.XEnd, self.YStart, self.YEnd = XStart, XEnd, YStart, YEnd
         self.myUpdate()
 
-    def coordinateShift(self, canvasPoint):
+    def coordinateShift_2d(self, canvasPoint):
+        return self.XShiftPC(canvasPoint.x), self.YShiftPC(canvasPoint.y)
+
+    def coordinateShift_3d(self, canvasPoint):
+        x, y, z = canvasPoint.x, canvasPoint.y, canvasPoint.z
         return self.XShiftPC(canvasPoint.x), self.YShiftPC(canvasPoint.y)
 
     # Перевод координаты X из представления человека в представление канвы
@@ -324,7 +328,7 @@ class PolygonField(CartesianField):
     def __init__(self, rootFrame, root, **kwargs):
         super(PolygonField, self).__init__(rootFrame, root, **kwargs)
 
-        self.rotatePoint = CanvasPoint(0, 0)
+        self.rotatePoint = Point_2d(0, 0)
         self.colorNowPol = Settings.COLOR_LINE
 
         self.polygons = []
@@ -336,7 +340,7 @@ class PolygonField(CartesianField):
     def showPoint(self, x, y, color=Settings.COLOR_NEW_POINT):
         col = self.colorNowPol
 
-        point = CanvasPoint(float(x), float(y), showComments=self.ShowComments, color=col)
+        point = Point_2d(float(x), float(y), showComments=self.ShowComments, color=col)
         self.polygons[-1].addPoint(self, point, col)
 
     def createBinds(self):
