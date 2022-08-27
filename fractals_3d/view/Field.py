@@ -18,6 +18,7 @@ class ResizingCanvas(Canvas):
 
         self.bind('<1>', lambda event: self.click(event), '+')
         self.bind('<B1-Motion>', lambda event: self.motionRotate(event), '+')
+        self.bind('<B1-ButtonRelease>', lambda event: self.stopRotate(event), '+')
         self.bind("<Motion>", lambda event: self.showCoords(event), '+')
         self.bind("<Leave>", lambda event: self.hideCoords(event), '+')
 
@@ -34,6 +35,7 @@ class ResizingCanvas(Canvas):
         self.image = None
 
         self.needRebuild = False
+        self.startXY = None
 
     def mouseRotate(self, mode):
         pass
@@ -56,8 +58,20 @@ class ResizingCanvas(Canvas):
         print('click')
 
     def motionRotate(self, event):
-        print(event.x, event.y)
-        print('motionRotate')
+        if self.startXY is None:
+            self.startXY = (event.x, event.y)
+
+    def stopRotate(self, event):
+        if self.startXY is None:
+            return
+
+        x_start, y_start = self.startXY
+        x_end, y_end = event.x, event.y
+
+        x_diff = x_start - x_end
+        y_diff = y_start - y_end
+
+        self.startXY = None
 
     def showCoords(self, event):
         pass
@@ -439,6 +453,28 @@ class PolygonField(CartesianField):
 
     def mouseZoom(self, event):
         super(PolygonField, self).mouseZoom(event)
+
+    def motionRotate(self, event):
+        if self.startXY is None:
+            self.startXY = (event.x, event.y)
+
+        x_start, y_start = self.startXY
+        x_end, y_end = event.x, event.y
+
+        x_diff = x_start - x_end
+        y_diff = y_start - y_end
+
+        if x_diff != 0:
+            self.rotate(x_diff / 200, 'y')
+
+        if y_diff != 0:
+            self.rotate(-y_diff / 200, 'x')
+
+    def stopRotate(self, event):
+        if self.startXY is None:
+            return
+
+        self.startXY = None
 
 
 class WrapCanva:
