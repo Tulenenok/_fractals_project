@@ -72,7 +72,6 @@ class Primitive(BaseObj):
             c, w = params[0], params[1]
 
             if p1.x is not None and p2.y is not None:
-                print(key)
                 s1 = Segment_2d(p1, p2, color=c, width=w, tag=self.tag)
                 s1.show(field)
                 self.segments.append(s1)

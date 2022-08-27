@@ -1,4 +1,4 @@
-import math, random
+import math, random, copy
 
 from model.Figure import *
 from model.Params import *
@@ -19,26 +19,24 @@ class Fractal(Figure):
         super(Fractal, self).reShow(field)
 
     def calculate(self, showInRealTime=False, showSteps=True, field=None):
-        tmpParams = self.params.getCopy()
+        tmp = copy.deepcopy(self.params)
+
         stack = []
-        x, y, z, alpha = self.params.x, self.params.y, self.params.z, self.params.alpha
+        vertex, links = [(tmp.x, tmp.y, tmp.z)], []
 
-        vertex = [(x, y, z)]
-        links = []
+        i, j = 1, 2
 
-        i = 1
-        j = 2
         for r in self.params.axiom:
             if r.isalpha():
-                newX = x + tmpParams.step * math.cos(math.radians(alpha))
-                newY = y + tmpParams.step * math.sin(math.radians(alpha))
-                newZ = self.params.z
+                newX = tmp.x + tmp.step * tmp.HLU[0, 0]
+                newY = tmp.y + tmp.step * tmp.HLU[0, 1]
+                newZ = tmp.z + tmp.step * tmp.HLU[0, 2]
 
                 if r.isupper():
                     if showInRealTime:
-                        seg = Segment_2d(Vector_3d(x, y, z), Vector_3d(newX, newY, newZ),
-                                         color=tmpParams.color,
-                                         width=tmpParams.width, tag=self.tag)
+                        seg = Segment_2d(Vector_3d(tmp.x, tmp.y, tmp.z), Vector_3d(newX, newY, newZ),
+                                         color=tmp.color,
+                                         width=tmp.width, tag=self.tag)
                         seg.show(field)
                         self.segments.append(seg)
 
@@ -47,27 +45,38 @@ class Fractal(Figure):
 
                     vertex.append((newX, newY, newZ))
                     links += [i, j]
-                    self.paramsSegments[f'{i}, {j}'] = (tmpParams.color, tmpParams.width)
+                    self.paramsSegments[f'{i}, {j}'] = (tmp.color, tmp.width)
                     i = j
                     j += 1
 
-                x, y, z = newX, newY, newZ
+                tmp.x, tmp.y, tmp.z = newX, newY, newZ
 
             if r == '+':
-                alpha += tmpParams.delta
+                tmp.rotate(math.radians(tmp.delta), 'U')
             if r == '-':
-                alpha -= tmpParams.delta
+                tmp.rotate(math.radians(-tmp.delta), 'U')
+            if r == '&':
+                tmp.rotate(math.radians(tmp.delta), 'L')
+            if r == '^':
+                tmp.rotate(math.radians(-tmp.delta), 'L')
+            if r == '\\':
+                tmp.rotate(math.radians(tmp.delta), 'H')
+            if r == '/':
+                tmp.rotate(math.radians(-tmp.delta), 'H')
+            if r == '|':
+                tmp.rotate(math.radians(180), 'U')
+
             if r == '[':
-                stack.append((x, y, z, i, alpha, tmpParams.getCopy()))
+                stack.append((i, copy.deepcopy(tmp)))
             if r == ']':
-                x, y, z, i, alpha, tmpParams = stack.pop()
+                i, tmp = stack.pop()
+
             if r == '@':
-                tmpParams.width = tmpParams.width * 0.8
-                tmpParams.step = tmpParams.step * 0.8
+                tmp.width = tmp.width * 0.8
+                tmp.step = tmp.step * 0.8
 
         if not showSteps and showInRealTime:
             field.update()
-
 
         self.fillVert(vertex)
         self.fillPol(links)
@@ -143,3 +152,61 @@ class FractalGenerate(BaseObj):
 
         return ''.join(newRule)
 
+
+
+
+# def calculate2(self, showInRealTime=False, showSteps=True, field=None):
+    #     print('---')
+    #     tmpParams = self.params
+    #     stack = []
+    #     x, y, z, alpha = self.params.x, self.params.y, self.params.z, self.params.alpha
+    #
+    #     vertex = [(x, y, z)]
+    #     links = []
+    #
+    #     i = 1
+    #     j = 2
+    #     for r in self.params.axiom:
+    #         if r.isalpha():
+    #             newX = x + tmpParams.step * math.cos(math.radians(alpha))
+    #             newY = y + tmpParams.step * math.sin(math.radians(alpha))
+    #             print(int(x), int(y), alpha)
+    #             newZ = self.params.z
+    #
+    #             if r.isupper():
+    #                 if showInRealTime:
+    #                     seg = Segment_2d(Vector_3d(x, y, z), Vector_3d(newX, newY, newZ),
+    #                                      color=tmpParams.color,
+    #                                      width=tmpParams.width, tag=self.tag)
+    #                     seg.show(field)
+    #                     self.segments.append(seg)
+    #
+    #                     if showSteps:
+    #                         field.update()
+    #
+    #                 vertex.append((newX, newY, newZ))
+    #                 links += [i, j]
+    #                 self.paramsSegments[f'{i}, {j}'] = (tmpParams.color, tmpParams.width)
+    #                 i = j
+    #                 j += 1
+    #
+    #             x, y, z = newX, newY, newZ
+    #
+    #         if r == '+':
+    #             alpha += tmpParams.delta
+    #         if r == '-':
+    #             alpha -= tmpParams.delta
+    #         if r == '[':
+    #             stack.append((x, y, z, i, alpha, tmpParams.getCopy()))
+    #         if r == ']':
+    #             x, y, z, i, alpha, tmpParams = stack.pop()
+    #         if r == '@':
+    #             tmpParams.width = tmpParams.width * 0.8
+    #             tmpParams.step = tmpParams.step * 0.8
+    #
+    #     if not showSteps and showInRealTime:
+    #         field.update()
+    #
+    #
+    #     self.fillVert(vertex)
+    #     self.fillPol(links)
