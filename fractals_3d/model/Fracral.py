@@ -55,15 +55,15 @@ class Fractal(Figure):
                 tmp.rotate(math.radians(tmp.delta), 'U')
             if r == '-':
                 tmp.rotate(math.radians(-tmp.delta), 'U')
-            if r == '&':
+            if r == '&' or r == '_':
                 tmp.rotate(math.radians(tmp.delta), 'L')
             if r == '^':
                 tmp.rotate(math.radians(-tmp.delta), 'L')
-            if r == '\\':
+            if r == '|':
                 tmp.rotate(math.radians(tmp.delta), 'H')
             if r == '/':
                 tmp.rotate(math.radians(-tmp.delta), 'H')
-            if r == '|':
+            if r == '\\':
                 tmp.rotate(math.radians(180), 'U')
 
             if r == '[':
@@ -80,7 +80,6 @@ class Fractal(Figure):
 
         self.fillVert(vertex)
         self.fillPol(links)
-
 
     def show(self, field, needClean=True, showSteps=True):
         if self.needCalc:
@@ -108,7 +107,7 @@ class FractalGenerate(BaseObj):
 
         self.lastFractal = None
 
-    def show(self, field, needClear=True, showOnlyLast=False):
+    def show(self, field, needClear=True, showOnlyLast=True):
         try:
             field = field.canva
         except:
@@ -121,7 +120,7 @@ class FractalGenerate(BaseObj):
             prm = self.params.getAll()
 
             if not showOnlyLast or i == self.n - 1:
-                self.lastFractal = Fractal(*prm, self.tag, )
+                self.lastFractal = Fractal(*prm, self.tag )
                 self.lastFractal.show(field, needClear, showSteps=self.params.n <= 10)
 
             self.params.axiom = self._updateAxiom(self.params.axiom, self.params.rules)

@@ -23,6 +23,7 @@ def interpret(field, startX=0, startY=0, startZ=0, startAlpha=90, delta=22.5, d=
 def drawFractal(field, startParams, fractalParams, colorsParams):
     x, y, z, alpha = startParams.getXY()
     Axiom, Rule, Step, Delta, N = fractalParams.getXY()
+    Rule = Rule.replace("\\", "|")
     bg, line, width = colorsParams.getXY()
 
     field.canva['bg'] = bg

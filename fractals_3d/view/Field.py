@@ -17,6 +17,7 @@ class ResizingCanvas(Canvas):
         self.bind("<Configure>", self.resize)
 
         self.bind('<1>', lambda event: self.click(event), '+')
+        self.bind('<B1-Motion>', lambda event: self.motionRotate(event), '+')
         self.bind("<Motion>", lambda event: self.showCoords(event), '+')
         self.bind("<Leave>", lambda event: self.hideCoords(event), '+')
 
@@ -53,6 +54,10 @@ class ResizingCanvas(Canvas):
 
     def click(self, event):
         print('click')
+
+    def motionRotate(self, event):
+        print(event.x, event.y)
+        print('motionRotate')
 
     def showCoords(self, event):
         pass

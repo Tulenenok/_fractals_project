@@ -13,7 +13,7 @@ class Params:
 
         self.x, self.y, self.z = startX, startY, startZ
         self.alpha, self.delta = startAlpha, delta
-        self.step = int(d)
+        self.step = float(d)
 
         self.axiom = axiom
         self.rules = rules if type(rules) == dict else eval('{' + str(rules) + '}')
@@ -44,21 +44,20 @@ class Params:
             tmp_matrix = np.matrix([[np.cos(angle), np.sin(angle), 0],
                                    [-np.sin(angle), np.cos(angle), 0],
                                    [0, 0, 1]], dtype='float64')
-            self.HLU = tmp_matrix * self.HLU
 
         # Вокруг Y
         if axis == 'L':
             tmp_matrix = np.matrix([[np.cos(angle), 0, -np.sin(angle)],
                                     [0, 1, 0],
                                     [np.sin(angle), 0, np.cos(angle)]], dtype='float64')
-            self.HLU *= tmp_matrix
 
         # Вокруг Х
         if axis == 'H':
             tmp_matrix = np.matrix([[1, 0, 0],
                                     [0, np.cos(angle), -np.sin(angle)],
                                     [np.sin(angle), 0, np.cos(angle)]], dtype='float64')
-            self.HLU *= tmp_matrix
+
+        self.HLU = tmp_matrix * self.HLU
 
     def getAll(self):
         return self.x, self.y, self.z, self.alpha, self.delta, self.step, self.axiom, self.rules, self.n, self.color, self.width
