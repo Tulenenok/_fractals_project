@@ -405,18 +405,26 @@ class PolygonField(CartesianField):
         self.myUpdate()
         self.save()
 
-    def shift(self, xShift, yShift):
+    def move(self, v):
         for pol in self.polygons:
             pol.hide(self)
-            pol.shiftPol(xShift, yShift)
+            pol.move(v)
 
         self.myUpdate()
         self.save()
 
-    def scale(self, x, y, kx, ky):
+    def scale(self, x, y, z):
         for pol in self.polygons:
             pol.hide(self)
-            pol.scalePol(x, y, kx, ky)
+            pol.scale(x, y, z)
+
+        self.myUpdate()
+        self.save()
+
+    def rotate(self, angle, axis):
+        for pol in self.polygons:
+            pol.hide(self)
+            pol.rotate(angle, axis)
 
         self.myUpdate()
         self.save()

@@ -17,8 +17,8 @@ class Camera(BaseObj):
 
     def observeRange(self):
         centerPoint = self.pivot.center
-        leftPoint = Vector_3d(0, centerPoint.y, self.screenDist)
-        rightPoint = Vector_3d(self.field.XEnd - self.field.XStart, centerPoint.y, self.screenDist)
+        leftPoint = Vector_3d(0, centerPoint.y, centerPoint.z - self.screenDist)
+        rightPoint = Vector_3d(self.field.XEnd - self.field.XStart, centerPoint.y, centerPoint.z - self.screenDist)
 
         v1 = leftPoint - centerPoint
         v2 = rightPoint - centerPoint
@@ -40,10 +40,11 @@ class Camera(BaseObj):
             return Vector_2d(None, None)
 
         angle = self.observeRange()
+        # angle = math.radians(10)
         width = self.field.XEnd - self.field.XStart
         scale = width / (2 * self.screenDist * math.tan(angle / 2))
 
-        delta = self.screenDist / local.z
+        delta = self.screenDist / local.z * scale
         prt = Vector_2d(local.x, local.y) * delta
 
         # Возвращаем точку только если она принадлежит экранной области

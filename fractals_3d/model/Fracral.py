@@ -1,80 +1,83 @@
 import math, random
 
-from controll.Tools import *
-from model.Segment import *
+from model.Figure import *
+from model.Params import *
 
 
-class Params:
-    def __init__(self, startX, startY, startAlpha, delta, d, axiom, rules, n, color='blue', width=2):
-
-        self.x, self.y, self.alpha = map(int, (startX, startY, startAlpha))
-        self.step = float(d)
-        self.delta = float(delta) if Tools.isFloat(delta) else eval(delta)
-        self.axiom = axiom
-        self.rules = rules if type(rules) == dict else eval('{' + str(rules) + '}')
-        self.n = int(n)
-        self.color, self.width = color, int(width)
-
-    def getAll(self):
-        return self.x, self.y, self.alpha, self.delta, self.step, self.axiom, self.rules, self.n, self.color, self.width
-
-    def getCopy(self):
-        return Params(*self.getAll())
-
-
-class Fractal(BaseObj):
-    def __init__(self, startX, startY, startAlpha, delta, d, axiom, rules, n, color='blue', width=2, tag='fractal'):
+class Fractal(Figure):
+    def __init__(self, startX, startY, startZ, startAlpha, delta, d, axiom, rules, n, color='blue', width=2, tag='fractal'):
         super().__init__()
 
-        self.params = Params(startX, startY, startAlpha, delta, d, axiom, rules, n, color, width)
+        self.params = Params(startX, startY, startZ, startAlpha, delta, d, axiom, rules, n, color, width)
         self.segments = []
         self.updateShowFlag = False
+        self.paramsSegments = dict()
+        self.needCalc = True
         self.tag = tag
 
     def reShow(self, field, **p):
-        if not self.segments:
-            self.show(field)
-        else:
-            for seg in self.segments:
-                seg.reShow(field)
+        super(Fractal, self).reShow(field)
 
-    def show(self, field, needClean=True, showSteps=True):
+    def calculate(self, showInRealTime=False, showSteps=True, field=None):
         tmpParams = self.params.getCopy()
         stack = []
+        x, y, z, alpha = self.params.x, self.params.y, self.params.z, self.params.alpha
+
+        vertex = [(x, y, z)]
+        links = []
+
+        i = 1
+        j = 2
         for r in self.params.axiom:
             if r.isalpha():
-                newX = tmpParams.x + tmpParams.step * math.cos(math.radians(tmpParams.alpha))
-                newY = tmpParams.y + tmpParams.step * math.sin(math.radians(tmpParams.alpha))
+                newX = x + tmpParams.step * math.cos(math.radians(alpha))
+                newY = y + tmpParams.step * math.sin(math.radians(alpha))
+                newZ = self.params.z
 
                 if r.isupper():
-                    print('draw', tmpParams.x, tmpParams.y, newX, newY)
-                    seg = Segment_2d(Point_2d(tmpParams.x, tmpParams.y), Point_2d(newX, newY),
-                                     color=tmpParams.color,
-                                     width=tmpParams.width, tag=self.tag)
-                    seg.show(field)
-                    self.segments.append(seg)
+                    if showInRealTime:
+                        seg = Segment_2d(Vector_3d(x, y, z), Vector_3d(newX, newY, newZ),
+                                         color=tmpParams.color,
+                                         width=tmpParams.width, tag=self.tag)
+                        seg.show(field)
+                        self.segments.append(seg)
 
-                    if showSteps:
-                        field.update()
+                        if showSteps:
+                            field.update()
 
-                tmpParams.x, tmpParams.y = newX, newY
+                    vertex.append((newX, newY, newZ))
+                    links += [i, j]
+                    self.paramsSegments[f'{i}, {j}'] = (tmpParams.color, tmpParams.width)
+                    i = j
+                    j += 1
+
+                x, y, z = newX, newY, newZ
 
             if r == '+':
-                tmpParams.alpha += tmpParams.delta
+                alpha += tmpParams.delta
             if r == '-':
-                tmpParams.alpha -= tmpParams.delta
+                alpha -= tmpParams.delta
             if r == '[':
-                stack.append(tmpParams.getCopy())
-                print('push', tmpParams.x, tmpParams.y)
+                stack.append((x, y, z, i, alpha, tmpParams.getCopy()))
             if r == ']':
-                tmpParams = stack.pop()
-                print('pop', tmpParams.x, tmpParams.y)
+                x, y, z, i, alpha, tmpParams = stack.pop()
             if r == '@':
                 tmpParams.width = tmpParams.width * 0.8
                 tmpParams.step = tmpParams.step * 0.8
 
-        if not showSteps:
+        if not showSteps and showInRealTime:
             field.update()
+
+
+        self.fillVert(vertex)
+        self.fillPol(links)
+
+
+    def show(self, field, needClean=True, showSteps=True):
+        if self.needCalc:
+            self.calculate(False, showSteps, field)
+            self.needCalc = False
+        super(Fractal, self).show(field)
 
     def hide(self, field, **p):
         for seg in self.segments:
@@ -82,11 +85,12 @@ class Fractal(BaseObj):
         self.segments.clear()
 
 
+
 class FractalGenerate(BaseObj):
-    def __init__(self, startX, startY, startAlpha, delta, d, axiom, rules, n, color='blue', width=2, tag='fractal'):
+    def __init__(self, startX, startY, startZ, startAlpha, delta, d, axiom, rules, n, color='blue', width=2, tag='fractal'):
         super(FractalGenerate, self).__init__()
 
-        self.params = Params(startX, startY, startAlpha, delta, d, axiom, rules, n, color, width)
+        self.params = Params(startX, startY, startZ, startAlpha, delta, d, axiom, rules, n, color, width)
         self.n = self.params.n
         self.startAxiom = self.params.axiom
 

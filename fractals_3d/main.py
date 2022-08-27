@@ -7,29 +7,27 @@ from controll.FileWork import *
 from model.Fracral import *
 import time
 
-# ToDo удаление на поле работает как 💩
 
-
-def interpret(field, startX=0, startY=0, startAlpha=90, delta=22.5, d=2, axiom='F',
+def interpret(field, startX=0, startY=0, startZ=0, startAlpha=90, delta=22.5, d=2, axiom='F',
               rules={}, n=5, color='blue', width=2, needClean=True, needDelay=False):
 
-    newFractal = FractalGenerate(startX, startY, startAlpha, delta, d, axiom, rules, n, color, width)
+    newFractal = FractalGenerate(startX, startY, startZ, startAlpha, delta, d, axiom, rules, n, color, width)
     newFractal.show(field, needClean)
 
-    field.canva.addPol(newFractal)
+    field.canva.addPol(newFractal.lastFractal)
 
     if needDelay:
         time.sleep(1)
 
 
 def drawFractal(field, startParams, fractalParams, colorsParams):
-    x, y, alpha = startParams.getXY()
+    x, y, z, alpha = startParams.getXY()
     Axiom, Rule, Step, Delta, N = fractalParams.getXY()
     bg, line, width = colorsParams.getXY()
 
     field.canva['bg'] = bg
     field.canva.clear()
-    interpret(field, x, y, alpha, Delta, Step, Axiom, Rule, N, color=line, width=width)
+    interpret(field, x, y, z, alpha, Delta, Step, Axiom, Rule, N, color=line, width=width)
 
     # try:
     #     field.canva['bg'] = bg
@@ -64,8 +62,8 @@ def main():
     closeBtn.place(height=20, width=20, relx=0.89)
 
     startParams = Xs_Ys_Form(settings, Settings.COLOR_LOC_LINE, "Initial conditions", Settings.WIDTH_INPUT + 3,
-                          fields=['X: ', 'Y: ', 'α: '], showButton=False)
-    startParams.insertXY((0, 0, 90))
+                          fields=['X: ', 'Y: ', 'Z', 'α: '], showButton=False)
+    startParams.insertXY((0, 0, 0, 90))
     startParams.show(Settings.COLOR_LOC_LINE, posx=10, posy=10)
 
     fractalParams = Xs_Ys_Form(settings, Settings.COLOR_LOC_LINE, "Fractal parameters", Settings.WIDTH_INPUT - 2,
@@ -91,15 +89,21 @@ def main():
     openBtn = Button(root, text="🌷", padx=6, pady=10, command=lambda : showSettings(), bg=Settings.COLOR_LOC_BG)
     openBtn.place(x=0, rely=0, relheight=0.5)
 
-    def showSettings():
+    def showSettings(param=1):
         nonlocal settFlag
         settFlag = not settFlag
         if settFlag:
             openBtn.place_forget()
             openBtn2.place_forget()
-            settings.place(x=0, y=0, relheight=1, width=198)
+            if param == 1:
+                settings.place(x=0, y=0, relheight=1, width=198)
+            else:
+                settings2.place(x=0, y=0, relheight=1, width=198)
         else:
-            settings.place_forget()
+            if param == 1:
+                settings.place_forget()
+            else:
+                settings2.place_forget()
             openBtn.place(x=0, rely=0, relheight=0.5)
             openBtn2.place(x=0, rely=0.5, relheight=0.5)
 
@@ -108,7 +112,7 @@ def main():
     settings2 = LabelFrame(root, bg=Settings.COLOR_LOC_LINE)
     settFlag = False
 
-    closeBtn2 = Button(settings2, text="❌", command=lambda: showSettings2(), bg=Settings.COLOR_LOC_LINE, bd=0,
+    closeBtn2 = Button(settings2, text="❌", command=lambda: showSettings(2), bg=Settings.COLOR_LOC_LINE, bd=0,
                        fg='white')
     closeBtn2.place(height=20, width=20, relx=0.89)
 
@@ -135,20 +139,8 @@ def main():
     goButton2.place(x=10, y=576)
     # settings2
 
-    openBtn2 = Button(root, text="⎈", padx=6, pady=10, command=lambda: showSettings2(), bg=Settings.COLOR_LOC_BG)
+    openBtn2 = Button(root, text=".\n.\n.\n", padx=10, pady=10, command=lambda: showSettings(2), bg=Settings.COLOR_LOC_BG)
     openBtn2.place(x=0, rely=0.5, relheight=0.5)
-
-    def showSettings2():
-        nonlocal settFlag
-        settFlag = not settFlag
-        if settFlag:
-            settings2.place(x=0, y=0, relheight=1, width=198)
-            openBtn.place_forget()
-            openBtn2.place_forget()
-        else:
-            settings2.place_forget()
-            openBtn.place(x=0, rely=0, relheight=0.5)
-            openBtn2.place(x=0, rely=0.5, relheight=0.5)
 
     fig = None
 
@@ -160,17 +152,17 @@ def main():
 
             fig = FileWork.loadFigure()
             c.canva.addPol(fig)
-        elif mode == 'rotate' and fig:
+        elif mode == 'rotate':
             x, y, z = map(math.radians, map(float, rotateParams.getXY()))
-            fig.rotate(x, 'x')
-            fig.rotate(y, 'y')
-            fig.rotate(z, 'z')
-        elif mode == 'move' and fig:
+            c.canva.rotate(x, 'x')
+            c.canva.rotate(y, 'y')
+            c.canva.rotate(z, 'z')
+        elif mode == 'move':
             x, y, z = map(float, moveParams.getXY())
-            fig.move(Vector_3d(x, y, z))
-        elif mode == 'scale' and fig:
+            c.canva.move(Vector_3d(x, y, z))
+        elif mode == 'scale':
             x, y, z = map(float, scaleParams.getXY())
-            fig.scale(x, y, z)
+            c.canva.scale(x, y, z)
 
         if fig:
             fig.reShow(c.canva)

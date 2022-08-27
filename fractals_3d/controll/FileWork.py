@@ -8,7 +8,7 @@ import pandas as pd
 
 class FileWork:
 
-    NAMES = ['X', 'Y', 'Alpha', 'Axiom', 'Rule', 'Step', 'Delta', 'N', 'Bg', 'Line', 'Width']
+    NAMES = ['X', 'Y', 'Z', 'Alpha', 'Axiom', 'Rule', 'Step', 'Delta', 'N', 'Bg', 'Line', 'Width']
 
     @staticmethod
     def loadFigure():
@@ -51,9 +51,9 @@ class FileWork:
                 print("aaa")
                 return
 
-            startParams.insertXY(coords[:3])
-            fractalParams.insertXY((coords[3:8]))
-            colorsParams.insertXY(coords[8:])
+            startParams.insertXY(coords[:4])
+            fractalParams.insertXY((coords[4:9]))
+            colorsParams.insertXY(coords[9:])
 
     @staticmethod
     def saveData(startParams, fractalParams, colorsParams):

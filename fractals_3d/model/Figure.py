@@ -5,7 +5,7 @@ class Figure(Primitive):
     def __init__(self, color='blue', colorP='magenta', tag='pr'):
         super(Figure, self).__init__(color, colorP, tag)
 
-    def fillVert(self, array):
+    def fillVert(self, array: [[float, float, float]]):
         self.globalVertices.clear()
         self.localVertices.clear()
 
