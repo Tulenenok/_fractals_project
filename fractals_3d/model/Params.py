@@ -9,7 +9,8 @@ class Params:
                  startAlpha,
                  delta, d,
                  axiom, rules,
-                 n, color='blue', width=2):
+                 n, color='blue', width=2,
+                 constants=[]):
 
         self.x, self.y, self.z = startX, startY, startZ
         self.alpha, self.delta = startAlpha, delta
@@ -19,13 +20,14 @@ class Params:
 
         self.rules = dict()
         self.__parseRules(rules)
-        print(self.rules)
 
         self.n = int(float(n))
         self.color, self.width = color, int(float(width))
 
         self.HLU = np.matrix([[1, 0, 0], [0, 1, 0], [0, 0, 1]], dtype='float64')
         self.rotate(math.radians(self.alpha), 'U')
+
+        self.constants = eval(str(constants))
 
     def __str__(self):
         return f'(x, y, z) = {self.x, self.y, self.z}\n' \
@@ -63,7 +65,7 @@ class Params:
         self.HLU = tmp_matrix * self.HLU
 
     def getAll(self):
-        return self.x, self.y, self.z, self.alpha, self.delta, self.step, self.axiom, self.rules, self.n, self.color, self.width
+        return self.x, self.y, self.z, self.alpha, self.delta, self.step, self.axiom, self.rules, self.n, self.color, self.width, self.constants
 
     def getCopy(self):
         return Params(*self.getAll())
@@ -117,6 +119,7 @@ class Params:
             if len(params) not in self.rules[letter]:
                 self.rules[letter][len(params)] = dict()
 
+            # ToDo
             self.rules[letter][len(params)] = [params, condition, child.strip()]
 
             # if params not in self.rules[letter][len(params)]:

@@ -9,9 +9,9 @@ import time
 
 
 def interpret(field, startX=0, startY=0, startZ=0, startAlpha=90, delta=22.5, d=2, axiom='F',
-              rules={}, n=5, color='blue', width=2, needClean=True, needDelay=False):
+              rules={}, n=5, color='blue', width=2, needClean=True, needDelay=False, constants=[]):
 
-    newFractal = FractalGenerate(startX, startY, startZ, startAlpha, delta, d, axiom, rules, n, color, width)
+    newFractal = FractalGenerate(startX, startY, startZ, startAlpha, delta, d, axiom, rules, n, color, width, constants=constants)
     newFractal.show(field, needClean)
 
     field.canva.addPol(newFractal.lastFractal)
@@ -22,14 +22,14 @@ def interpret(field, startX=0, startY=0, startZ=0, startAlpha=90, delta=22.5, d=
 
 def drawFractal(field, startParams, fractalParams, colorsParams):
     x, y, z, alpha = startParams.getXY()
-    Axiom, Rule, Step, Delta, N = fractalParams.getXY()
+    Axiom, Rule, Step, Delta, N, constants = fractalParams.getXY()
     Rule = Rule.replace("\\", "|")
     Rule = Rule.replace("||", "|")
     bg, line, width = colorsParams.getXY()
 
     field.canva['bg'] = bg
     field.canva.clear()
-    interpret(field, x, y, z, alpha, Delta, Step, Axiom, Rule, N, color=line, width=width)
+    interpret(field, x, y, z, alpha, Delta, Step, Axiom, Rule, N, color=line, width=width, constants=constants)
 
     # try:
     #     field.canva['bg'] = bg
@@ -69,8 +69,11 @@ def main():
     startParams.show(Settings.COLOR_LOC_LINE, posx=10, posy=10)
 
     fractalParams = Xs_Ys_Form(settings, Settings.COLOR_LOC_LINE, "Fractal parameters", Settings.WIDTH_INPUT - 2,
-                             fields=['Axiom: ', 'Rule: ', 'Step: ', 'Delta: ', 'N: '], showButton=False)
-    fractalParams.insertXY(('F-F-F-F', "['F: FF-F-F-F-FF']", 2, 90, 4))
+                             fields=['Axiom: ', 'Rule: ', 'Step: ', 'Delta: ', 'N: ', 'Const: '], showButton=False)
+    # fractalParams.insertXY(('F-F-F-F', "['F: FF-F-F-F-FF']", 2, 90, 4))
+
+    fractalParams.insertXY(('F(1, 2)', "['F(x): F(x)-F(x)-F(x)-F(x)', 'F(x, y): F(x)-F(x)-F(x)-F(x)']", 2, 90, 4, []))
+
     fractalParams.show(Settings.COLOR_LOC_LINE, posx=10, posy=160)
 
     colorsParams = Xs_Ys_Form(settings, Settings.COLOR_LOC_LINE, "Appearance", Settings.WIDTH_INPUT - 2,

@@ -8,7 +8,7 @@ import pandas as pd
 
 class FileWork:
 
-    NAMES = ['X', 'Y', 'Z', 'Alpha', 'Axiom', 'Rule', 'Step', 'Delta', 'N', 'Bg', 'Line', 'Width']
+    NAMES = ['X', 'Y', 'Z', 'Alpha', 'Axiom', 'Rule', 'Step', 'Delta', 'N', 'Constants', 'Bg', 'Line', 'Width']
 
     @staticmethod
     def loadFigure():
@@ -29,7 +29,7 @@ class FileWork:
             xl = pd.ExcelFile(filename.replace('\\', '\\\\'))
             list_points = xl.parse(xl.sheet_names[0])
             data = list_points[FileWork.NAMES]
-            newData = [list(data[i])[0] if i != 'Rule' else list(data[i]) for i in FileWork.NAMES]
+            newData = [list(data[i])[0] if i != 'Rule' and i != 'Constants' else list(data[i].dropna()) for i in FileWork.NAMES]
         except:
             print("Error with file")
             return []
@@ -51,8 +51,8 @@ class FileWork:
                 return
 
             startParams.insertXY(coords[:4])
-            fractalParams.insertXY((coords[4:9]))
-            colorsParams.insertXY(coords[9:])
+            fractalParams.insertXY((coords[4:10]))
+            colorsParams.insertXY(coords[10:])
 
     @staticmethod
     def saveData(startParams, fractalParams, colorsParams):
