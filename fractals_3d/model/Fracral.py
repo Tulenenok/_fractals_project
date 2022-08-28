@@ -27,8 +27,6 @@ class Fractal(Figure):
         i, j = 1, 2
 
         for r in self.params.axiom:
-            print(r)
-            print(np.matrix(tmp.HLU, dtype='int32'))
             if r.isalpha():
                 newX = tmp.x + tmp.step * tmp.HLU[0, 0]
                 newY = tmp.y + tmp.step * tmp.HLU[0, 1]
@@ -144,70 +142,36 @@ class FractalGenerate(BaseObj):
 
 
     def _updateAxiom(self, axiom, rules):
+        def countParams(i, axiom):
+            if i == len(axiom) - 1 or axiom[i + 1] != '(':
+                return i, 0, []
+
+            i += 2
+            c, params = 0, []
+            while axiom[i] != ')':
+                if axiom[i].isalpha() or axiom[i].isdigit():
+                    params.append(axiom[i])
+                    i += 1
+
+            return i, len(params), params
+
         newRule = []
-        for r in axiom:
+        i = 0
+        while i < len(axiom):
+            r = axiom[i]
+
             if r in rules:
-                newRule.append(rules[r])
+                i, count, params = countParams(i, axiom)
+                if count in rules[r]:
+                    prm, cond, child = rules[r][count]
+                    dct = dict()
+                    for i, key in enumerate(prm):
+                        dct[key] = params[i]
+
+                    if eval(cond, dct):
+                        newRule.append(child)
             else:
                 newRule.append(r)
 
+            i += 1
         return ''.join(newRule)
-
-
-
-
-# def calculate2(self, showInRealTime=False, showSteps=True, field=None):
-    #     print('---')
-    #     tmpParams = self.params
-    #     stack = []
-    #     x, y, z, alpha = self.params.x, self.params.y, self.params.z, self.params.alpha
-    #
-    #     vertex = [(x, y, z)]
-    #     links = []
-    #
-    #     i = 1
-    #     j = 2
-    #     for r in self.params.axiom:
-    #         if r.isalpha():
-    #             newX = x + tmpParams.step * math.cos(math.radians(alpha))
-    #             newY = y + tmpParams.step * math.sin(math.radians(alpha))
-    #             print(int(x), int(y), alpha)
-    #             newZ = self.params.z
-    #
-    #             if r.isupper():
-    #                 if showInRealTime:
-    #                     seg = Segment_2d(Vector_3d(x, y, z), Vector_3d(newX, newY, newZ),
-    #                                      color=tmpParams.color,
-    #                                      width=tmpParams.width, tag=self.tag)
-    #                     seg.show(field)
-    #                     self.segments.append(seg)
-    #
-    #                     if showSteps:
-    #                         field.update()
-    #
-    #                 vertex.append((newX, newY, newZ))
-    #                 links += [i, j]
-    #                 self.paramsSegments[f'{i}, {j}'] = (tmpParams.color, tmpParams.width)
-    #                 i = j
-    #                 j += 1
-    #
-    #             x, y, z = newX, newY, newZ
-    #
-    #         if r == '+':
-    #             alpha += tmpParams.delta
-    #         if r == '-':
-    #             alpha -= tmpParams.delta
-    #         if r == '[':
-    #             stack.append((x, y, z, i, alpha, tmpParams.getCopy()))
-    #         if r == ']':
-    #             x, y, z, i, alpha, tmpParams = stack.pop()
-    #         if r == '@':
-    #             tmpParams.width = tmpParams.width * 0.8
-    #             tmpParams.step = tmpParams.step * 0.8
-    #
-    #     if not showSteps and showInRealTime:
-    #         field.update()
-    #
-    #
-    #     self.fillVert(vertex)
-    #     self.fillPol(links)

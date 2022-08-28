@@ -24,6 +24,7 @@ def drawFractal(field, startParams, fractalParams, colorsParams):
     x, y, z, alpha = startParams.getXY()
     Axiom, Rule, Step, Delta, N = fractalParams.getXY()
     Rule = Rule.replace("\\", "|")
+    Rule = Rule.replace("||", "|")
     bg, line, width = colorsParams.getXY()
 
     field.canva['bg'] = bg
@@ -69,7 +70,7 @@ def main():
 
     fractalParams = Xs_Ys_Form(settings, Settings.COLOR_LOC_LINE, "Fractal parameters", Settings.WIDTH_INPUT - 2,
                              fields=['Axiom: ', 'Rule: ', 'Step: ', 'Delta: ', 'N: '], showButton=False)
-    fractalParams.insertXY(('F-F-F-F', '"F": "FF-F-F-F-FF"', 2, 90, 4))
+    fractalParams.insertXY(('F-F-F-F', "['F: FF-F-F-F-FF']", 2, 90, 4))
     fractalParams.show(Settings.COLOR_LOC_LINE, posx=10, posy=160)
 
     colorsParams = Xs_Ys_Form(settings, Settings.COLOR_LOC_LINE, "Appearance", Settings.WIDTH_INPUT - 2,

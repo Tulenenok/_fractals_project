@@ -18,7 +18,6 @@ class FileWork:
         if filename:
             newFigure = Figure()
             newFigure.loadFromTxt(filename)
-            print(newFigure.globalVertices)
             return newFigure
 
     @staticmethod
@@ -30,7 +29,7 @@ class FileWork:
             xl = pd.ExcelFile(filename.replace('\\', '\\\\'))
             list_points = xl.parse(xl.sheet_names[0])
             data = list_points[FileWork.NAMES]
-            newData = [list(data[i])[0] for i in FileWork.NAMES]
+            newData = [list(data[i])[0] if i != 'Rule' else list(data[i]) for i in FileWork.NAMES]
         except:
             print("Error with file")
             return []
