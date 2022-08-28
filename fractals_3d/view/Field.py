@@ -470,6 +470,8 @@ class PolygonField(CartesianField):
         if y_diff != 0:
             self.rotate(-y_diff / 200, 'x')
 
+        # self.startXY = (event.x, event.y)
+
     def stopRotate(self, event):
         if self.startXY is None:
             return

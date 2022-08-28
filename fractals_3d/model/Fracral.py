@@ -27,6 +27,8 @@ class Fractal(Figure):
         i, j = 1, 2
 
         for r in self.params.axiom:
+            print(r)
+            print(np.matrix(tmp.HLU, dtype='int32'))
             if r.isalpha():
                 newX = tmp.x + tmp.step * tmp.HLU[0, 0]
                 newY = tmp.y + tmp.step * tmp.HLU[0, 1]

@@ -55,7 +55,7 @@ class Params:
         if axis == 'H':
             tmp_matrix = np.matrix([[1, 0, 0],
                                     [0, np.cos(angle), -np.sin(angle)],
-                                    [np.sin(angle), 0, np.cos(angle)]], dtype='float64')
+                                    [0, np.sin(angle), np.cos(angle)]], dtype='float64')
 
         self.HLU = tmp_matrix * self.HLU
 
