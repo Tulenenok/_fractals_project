@@ -117,10 +117,10 @@ class Params:
                 self.rules[letter] = dict()
 
             if len(params) not in self.rules[letter]:
-                self.rules[letter][len(params)] = dict()
+                self.rules[letter][len(params)] = [params, dict()]
 
             # ToDo
-            self.rules[letter][len(params)] = [params, condition, child.strip()]
+            self.rules[letter][len(params)][1][condition] = child.strip()
 
             # if params not in self.rules[letter][len(params)]:
             #     self.rules[letter][len(params)][params] = dict()

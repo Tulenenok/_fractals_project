@@ -41,7 +41,7 @@ def drawFractal(field, startParams, fractalParams, colorsParams):
 
 def main():
     root = RootWithVersions()
-    root.geometry('850x650')
+    root.geometry('850x680')
 
     root['bg'] = Settings.COLOR_MAIN_BG
 
@@ -74,21 +74,21 @@ def main():
 
     fractalParams.insertXY(('F(1, 2)', "['F(x): F(x)-F(x)-F(x)-F(x)', 'F(x, y): F(x)-F(x)-F(x)-F(x)']", 2, 90, 4, []))
 
-    fractalParams.show(Settings.COLOR_LOC_LINE, posx=10, posy=160)
+    fractalParams.show(Settings.COLOR_LOC_LINE, posx=10, posy=160 + 20)
 
     colorsParams = Xs_Ys_Form(settings, Settings.COLOR_LOC_LINE, "Appearance", Settings.WIDTH_INPUT - 2,
                                fields=['Bg: ', 'Line: ', 'Width: '], showButton=False)
     colorsParams.insertXY(('white', 'blue', 2))
-    colorsParams.show(Settings.COLOR_LOC_LINE, posx=10, posy=370)
+    colorsParams.show(Settings.COLOR_LOC_LINE, posx=10, posy=370 + 40)
 
     loadButton = Button(settings, text="Load", padx=21, pady=7, bg="#d1d6e4", command=lambda : FileWork.loadData(startParams, fractalParams, colorsParams))
-    loadButton.place(x=10, y=520)
+    loadButton.place(x=10, y=520 + 35)
 
     saveButton = Button(settings, text="Save", padx=21, pady=7, bg="#d1d6e4", command=lambda : FileWork.saveData(startParams, fractalParams, colorsParams))
-    saveButton.place(x=100, y=520)
+    saveButton.place(x=100, y=520 + 35)
 
     goButton = Button(settings, text="[ Draw fractal ]", padx=40, pady=15, bg=Settings.COLOR_LOC_BG, command=lambda : drawFractal(c, startParams, fractalParams, colorsParams))
-    goButton.place(x=10, y=576)
+    goButton.place(x=10, y=576 + 32)
     # settings
 
     openBtn = Button(root, text="🌷", padx=6, pady=10, command=lambda : showSettings(), bg=Settings.COLOR_LOC_BG)
@@ -139,9 +139,13 @@ def main():
     scaleParams.insertXY((2, 2, 2))
     scaleParams.show(Settings.COLOR_LOC_LINE, posx=10, posy=340)
 
+    goButton2 = Button(settings2, text="[ Save canva ]", padx=40, pady=15, bg=Settings.COLOR_LOC_BG,
+                       command=lambda: FileWork.saveCanva(c.canva))
+    goButton2.place(x=14, y=535)
+
     goButton2 = Button(settings2, text="[ Load figure ]", padx=40, pady=15, bg=Settings.COLOR_LOC_BG,
                       command=lambda: figureWork('load', '1'))
-    goButton2.place(x=10, y=576)
+    goButton2.place(x=14, y=576 + 30)
     # settings2
 
     openBtn2 = Button(root, text=".\n.\n.\n", padx=10, pady=10, command=lambda: showSettings(2), bg=Settings.COLOR_LOC_BG)

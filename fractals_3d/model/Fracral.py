@@ -169,15 +169,22 @@ class FractalGenerate(BaseObj):
             if r in rules:
                 i, count, params = countParams(i, axiom)
                 if count in rules[r]:
-                    prm, cond, child = rules[r][count]
+                    prm, condDct = rules[r][count]
+
                     dct = dict()
                     for j, key in enumerate(prm):
                         dct[key] = params[j]
-                        child = child.replace(key, str(params[j]))
 
-                    if eval(cond, dct):
-                        newRule.append(child)
-                        f = False
+                    for cond in condDct:
+                        child = condDct[cond]
+
+                        if eval(cond, dct):
+                            for k, p in enumerate(prm):
+                                child = child.replace(p, str(params[k]))
+                            newRule.append(child)
+                            f = False
+                            break
+
             if f:
                 newRule.append(r)
             i += 1

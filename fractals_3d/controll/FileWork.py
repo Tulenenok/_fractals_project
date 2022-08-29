@@ -2,6 +2,7 @@ import tkinter.filedialog as fd
 from model.Figure import Figure
 from controll.Settings import Settings
 from controll.Tools import Tools
+import canvasvg
 
 import pandas as pd
 
@@ -68,3 +69,10 @@ class FileWork:
             with pd.ExcelWriter(new_file.name) as writer:
                 df.to_excel(writer)
                 print('OK save')
+
+    @staticmethod
+    def saveCanva(canva):
+        new_file = fd.asksaveasfile(title="Сохранить канву", defaultextension=".svg",
+                                    filetypes=(("svg", "*.svg"),))
+        if new_file:
+            canvasvg.saveall(new_file.name, canva)
